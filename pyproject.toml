@@ -1,0 +1,58 @@
+[project]
+name = "druks-panel"
+version = "0.1.0"
+description = "A durable decision panel built on Druks."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Paulo Alvarado Garcia" }]
+keywords = ["agents", "decisions", "druks", "durable-execution", "workflows"]
+requires-python = ">=3.11"
+# Panel uses the post-0.3 app author surface. Pin the exact Druks commit until
+# that contract has a versioned release.
+dependencies = [
+    "druks @ git+https://github.com/czpython/druks.git@e73243170d4a8325eb8a4d5f8c1a705c3a2f5aac",
+]
+
+[project.urls]
+Documentation = "https://docs.druks.ai"
+Issues = "https://github.com/czpython/druks-panel/issues"
+Repository = "https://github.com/czpython/druks-panel"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.411",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "ruff>=0.16.1",
+]
+
+[project.entry-points."druks.apps"]
+panel = "druks_panel.app:Panel"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["druks_panel"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["SIM108"]
+
+[tool.pyright]
+pythonVersion = "3.11"
+include = ["druks_panel"]
+typeCheckingMode = "standard"
