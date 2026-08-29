@@ -1,14 +1,14 @@
 # Druks Panel
 
-Druks Panel turns a consequential question into an inspectable decision process.
-Three independent advisors examine opportunity, risk, and execution. A moderator
-synthesizes their arguments, then the workflow parks until a human chooses to
-proceed, revise, or pass.
+Druks Panel turns an important question into an inspectable decision process.
+Three independent advisors examine opportunity, risk, and execution. A
+moderator combines their arguments. Then the workflow parks until a human
+selects proceed, revise, or pass.
 
-It is deliberately small: one subject, one workflow, four agents, one human
-gate. That makes it an approachable example of a real
-[Druks](https://github.com/czpython/druks) app without turning the framework into
-the app.
+The app has one subject, one workflow, four agents, and one human gate. This
+small scope makes it a clear example of a
+[Druks](https://github.com/czpython/druks) app. Druks Panel remains separate
+from the framework.
 
 ## What it demonstrates
 
@@ -23,20 +23,22 @@ decision
    durable human decision
 ```
 
-- a separately packaged app registered through `druks.apps`
-- strict structured outputs for every agent
-- durable, replayable orchestration across agent calls and persistence steps
-- a subject-backed gate that can remain parked across restarts
-- app-owned models, migrations, HTTP routes, prompts, and dashboard UI
+The app provides these parts:
+
+- A separate app package that uses `druks.apps`
+- Strict structured outputs for each agent
+- Durable orchestration across agent calls and persistence steps
+- A subject-backed gate that can remain parked across restarts
+- App-owned models, migrations, HTTP routes, prompts, and dashboard UI.
 
 Druks reuses completed durable operations when a workflow recovers. An operation
-interrupted before completion may run again, so this app does not claim
+that stops before completion can run again. Thus, this app does not claim
 exactly-once external effects.
 
 ## Install for development
 
-Clone Druks and this repository beside each other, then install Panel into the
-Druks environment:
+Clone Druks and this repository into adjacent directories. Then install Panel
+in the Druks environment:
 
 ```bash
 git clone https://github.com/czpython/druks.git
@@ -46,34 +48,34 @@ uv sync --dev
 uv pip install -e ../druks-panel
 ```
 
-Start the Druks development stack using the
-[development guide](https://docs.druks.ai/development). Panel appears in the app
-switcher after Druks restarts and discovers the installed entry point.
+Use the [development guide](https://docs.druks.ai/development) to start the
+Druks development stack. Restart Druks after the installation. Druks finds the
+entry point and shows Panel in the app switcher.
 
-For an image-based deployment, extend the Druks image and install the package
-into its existing virtual environment:
+For an image deployment, extend the Druks image. Install the package in its
+existing virtual environment:
 
 ```dockerfile
 FROM ghcr.io/czpython/druks:latest
 RUN uv pip install "git+https://github.com/czpython/druks-panel.git"
 ```
 
-Use that image for the Druks `web` service, run `druks init-db`, and restart the
-service. Connect at least one Claude harness before starting a panel.
+Use that image for the Druks `web` service. Run `druks init-db`. Restart the
+service. Connect at least one Claude harness before you start a panel.
 
 ## Use
 
-Open **Panel** in the Druks dashboard, enter the decision and its context, then
-start deliberation. The page updates as the advisors and moderator finish. When
-the run parks, read the synthesis and record the human outcome.
+Open **Panel** in the Druks dashboard. Enter the decision and its context. Then
+start the deliberation. The page updates after each advisor and the moderator
+finish. When the run parks, read the synthesis. Record the human outcome.
 
-Agent defaults are ordinary Druks agent settings. An operator can change the
-model, effort, and timeout for each advisor from the dashboard without changing
-this package.
+Agent defaults use standard Druks agent settings. An operator can change the
+model, effort, and timeout for each advisor in the dashboard. This change does
+not require a package change.
 
 ## Develop
 
-Tests use the Druks pytest plugin and its isolated Postgres test database:
+The tests use the Druks pytest plugin and an isolated Postgres test database:
 
 ```bash
 uv sync --dev
@@ -84,6 +86,6 @@ uv run pytest
 node --check druks_panel/dist/entry.js
 ```
 
-The database defaults match Druks: Postgres at `localhost:5432`, user and
-password `druks`, database `druks_test`. Override it with
-`DRUKS_TEST_DATABASE_URL`.
+The database defaults match Druks. Postgres uses `localhost:5432`. The user and
+password are `druks`. The database is `druks_test`. Set
+`DRUKS_TEST_DATABASE_URL` to use a different database.
