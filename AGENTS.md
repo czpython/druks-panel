@@ -6,8 +6,6 @@ assessments. Then the workflow parks for a human outcome.
 
 ## Read map
 
-Use this read map:
-
 - Read the Druks app contracts at https://docs.druks.ai/writing-an-app.
 - Read the durable recovery semantics at https://docs.druks.ai/concepts#durability-and-recovery.
 - Read `druks_panel/workflows.py` for orchestration and the human gate.
@@ -15,8 +13,6 @@ Use this read map:
 - Read `druks_panel/dist/` for the standalone dashboard module in the wheel.
 
 ## Contracts
-
-Apply these contracts:
 
 - Install this distribution to register the app. Keep the
   `[project.entry-points."druks.apps"]` key and `Panel.name` set to `panel`.

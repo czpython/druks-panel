@@ -23,7 +23,7 @@ decision
    durable human decision
 ```
 
-The app provides these parts:
+The example includes:
 
 - A separate app package that uses `druks.apps`
 - Strict structured outputs for each agent
