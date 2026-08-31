@@ -5,8 +5,8 @@ Three independent advisors examine opportunity, risk, and execution. A
 moderator combines their arguments. Then the workflow parks until a human
 selects proceed, revise, or pass.
 
-The app has one subject, one workflow, four agents, and one human gate. This
-small scope makes it a clear example of a
+The app has one subject, one workflow, four agents, three pages, and one human
+gate. This small scope makes it a clear example of a
 [Druks](https://github.com/czpython/druks) app. Druks Panel remains separate
 from the framework.
 
@@ -29,7 +29,12 @@ The example includes:
 - Strict structured outputs for each agent
 - Durable orchestration across agent calls and persistence steps
 - A subject-backed gate that can remain parked across restarts
-- App-owned models, migrations, HTTP routes, prompts, and dashboard UI.
+- App-owned models, migrations, HTTP routes, prompts, and declared pages
+
+The screens are Python. `druks_panel/pages.py` declares them with `druks.ui`,
+and the Druks dashboard renders them. The app ships no JavaScript. Each page is
+a pure read that follows its subject, so the board and the decision page redraw
+as each advisor reports.
 
 Druks reuses completed durable operations when a workflow recovers. An operation
 that stops before completion can run again. Thus, this app does not claim
@@ -65,9 +70,10 @@ service. Connect at least one Claude harness before you start a panel.
 
 ## Use
 
-Open **Panel** in the Druks dashboard. Enter the decision and its context. Then
-start the deliberation. The page updates after each advisor and the moderator
-finish. When the run parks, read the synthesis. Record the human outcome.
+Open **Panel** in the Druks dashboard. Select **new decision**. Enter the
+decision and its context. Then start the deliberation. The page updates after
+each advisor and the moderator finish. When the run parks, read the synthesis.
+Then record the human outcome on the same page.
 
 Agent defaults use standard Druks agent settings. An operator can change the
 model, effort, and timeout for each advisor in the dashboard. This change does
@@ -75,17 +81,15 @@ not require a package change.
 
 ## Develop
 
-The tests use the Druks pytest plugin and an isolated Postgres test database:
+This repository has no tests. The gates are the linter, the formatter, and the
+type checker:
 
 ```bash
 uv sync --dev
 uv run ruff check .
 uv run ruff format --check .
 uv run pyright
-uv run pytest
-node --check druks_panel/dist/entry.js
 ```
 
-The database defaults match Druks. Postgres uses `localhost:5432`. The user and
-password are `druks`. The database is `druks_test`. Set
-`DRUKS_TEST_DATABASE_URL` to use a different database.
+Druks checks the rest at boot. It refuses the app if a page route, a navigation
+entry, or an action that names a route operation does not resolve.

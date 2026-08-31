@@ -8,10 +8,10 @@ license-files = ["LICENSE"]
 authors = [{ name = "Paulo Alvarado Garcia" }]
 keywords = ["agents", "decisions", "druks", "durable-execution", "workflows"]
 requires-python = ">=3.11"
-# Panel uses the post-0.3 app author surface. Pin the exact Druks commit until
-# that contract has a versioned release.
+# Panel declares its screens with the Druks UI V1 contract, which landed after
+# 0.4.0. Pin the exact Druks commit until that contract has a versioned release.
 dependencies = [
-    "druks @ git+https://github.com/czpython/druks.git@e73243170d4a8325eb8a4d5f8c1a705c3a2f5aac",
+    "druks @ git+https://github.com/czpython/druks.git@5743a1511ba8b5b4c1c8317c6678cdea678621ee",
 ]
 
 [project.urls]
@@ -22,8 +22,6 @@ Repository = "https://github.com/czpython/druks-panel"
 [dependency-groups]
 dev = [
     "pyright>=1.1.411",
-    "pytest>=9.1.1",
-    "pytest-asyncio>=1.4.0",
     "ruff>=0.16.1",
 ]
 
@@ -40,13 +38,11 @@ packages = ["druks_panel"]
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["tests"]
-
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Alembic-generated revisions are machine-written; don't hand-lint them.
+extend-exclude = ["druks_panel/migrations/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

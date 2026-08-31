@@ -6,8 +6,7 @@ from sqlalchemy import Text, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from druks_panel.contracts import AdvisorAssessment, ModeratorSynthesis
-from druks_panel.schemas import DecisionDetail, DecisionSummary
+from druks_panel.schemas import DecisionSummary
 from druks_panel.types import DecisionAction
 
 
@@ -68,16 +67,3 @@ class Decision(StoredSubject):
         self.outcome_note = note
         self.decided_at = self.utc_now()
         await db_session().flush()
-
-    async def get_detail(self) -> DecisionDetail:
-        from druks_panel.workflows import Deliberate
-
-        return DecisionDetail(
-            **self.get_summary().model_dump(),
-            context=self.context,
-            assessments=[AdvisorAssessment.model_validate(item) for item in self.assessments],
-            synthesis=ModeratorSynthesis.model_validate(self.synthesis) if self.synthesis else None,
-            outcome_note=self.outcome_note,
-            decided_at=self.decided_at,
-            status=await self.get_status(workflow=Deliberate),
-        )
