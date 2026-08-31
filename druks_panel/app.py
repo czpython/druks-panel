@@ -8,7 +8,7 @@ class Panel(App):
     name = "panel"
     icon = "message-square"
     description = "Pressure-tests a decision, then parks for the human call."
-    navigation = ["decisions", "new_decision"]
+    navigation = ["decisions"]
 
     opportunity = Agent(
         model="claude",
