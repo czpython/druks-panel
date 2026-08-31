@@ -606,7 +606,7 @@ wheels = [
 [[package]]
 name = "druks"
 version = "0.4.0"
-source = { git = "https://github.com/czpython/druks.git?rev=5743a1511ba8b5b4c1c8317c6678cdea678621ee#5743a1511ba8b5b4c1c8317c6678cdea678621ee" }
+source = { git = "https://github.com/czpython/druks.git?rev=c05c58876dde4f9dfb8eac0baeb5335bbb3991b9#c05c58876dde4f9dfb8eac0baeb5335bbb3991b9" }
 dependencies = [
     { name = "alembic" },
     { name = "apprise" },
@@ -647,7 +647,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "druks", git = "https://github.com/czpython/druks.git?rev=5743a1511ba8b5b4c1c8317c6678cdea678621ee" }]
+requires-dist = [{ name = "druks", git = "https://github.com/czpython/druks.git?rev=c05c58876dde4f9dfb8eac0baeb5335bbb3991b9" }]
 
 [package.metadata.requires-dev]
 dev = [

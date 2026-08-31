@@ -38,48 +38,6 @@ def _position_word(assessment: AdvisorAssessment) -> ui.StatusValue:
     return ui.StatusValue(assessment.position.replace("_", " "), tone="success")
 
 
-def _advisors(decision: Decision) -> ui.Section:
-    if decision.assessments:
-        assessments = [AdvisorAssessment.model_validate(item) for item in decision.assessments]
-        return ui.Section(
-            title="The advisors",
-            blocks=[
-                ui.Columns(
-                    [
-                        ui.Card(
-                            title=assessment.perspective.title(),
-                            description=assessment.headline,
-                            blocks=[
-                                ui.Facts(
-                                    [
-                                        ui.Fact("Position", value=_position_word(assessment)),
-                                        ui.Fact(
-                                            "Confidence",
-                                            value=ui.NumberValue(assessment.confidence, unit="%"),
-                                        ),
-                                    ]
-                                ),
-                                ui.List(
-                                    [ui.TextValue(item) for item in assessment.rationale],
-                                    title="Rationale",
-                                ),
-                                ui.List(
-                                    [ui.TextValue(item) for item in assessment.uncertainties],
-                                    title="Uncertainties",
-                                ),
-                            ],
-                        )
-                        for assessment in assessments
-                    ]
-                )
-            ],
-        )
-    return ui.Section(
-        title="The advisors",
-        blocks=[ui.Text("Each advisor reports here when it finishes.")],
-    )
-
-
 def _synthesis(decision: Decision) -> ui.Section:
     if decision.synthesis:
         synthesis = ModeratorSynthesis.model_validate(decision.synthesis)
@@ -248,6 +206,7 @@ async def decision(decision_id: int):
     found = await Decision.get(decision_id)
     if found:
         status = await found.get_status()
+        assessments = [AdvisorAssessment.model_validate(item) for item in found.assessments]
         return ui.Page(
             found.title,
             description=found.question,
@@ -267,7 +226,39 @@ async def decision(decision_id: int):
                     title="Context",
                     blocks=[ui.Markdown(found.context or "Nobody added context.")],
                 ),
-                _advisors(found),
+                ui.Cards(
+                    title="The advisors",
+                    cards=[
+                        ui.Card(
+                            title=assessment.perspective.title(),
+                            description=assessment.headline,
+                            blocks=[
+                                ui.Facts(
+                                    [
+                                        ui.Fact("Position", value=_position_word(assessment)),
+                                        ui.Fact(
+                                            "Confidence",
+                                            value=ui.NumberValue(assessment.confidence, unit="%"),
+                                        ),
+                                    ]
+                                ),
+                                ui.List(
+                                    [ui.TextValue(item) for item in assessment.rationale],
+                                    title="Rationale",
+                                ),
+                                ui.List(
+                                    [ui.TextValue(item) for item in assessment.uncertainties],
+                                    title="Uncertainties",
+                                ),
+                            ],
+                        )
+                        for assessment in assessments
+                    ],
+                    empty=ui.EmptyState(
+                        "No assessment yet",
+                        description="Each advisor reports here when it finishes.",
+                    ),
+                ),
                 _synthesis(found),
                 _human_call(found, status),
                 ui.Link("Everything Druks did about this decision", subject=found),
