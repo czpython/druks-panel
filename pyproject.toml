@@ -8,11 +8,7 @@ license-files = ["LICENSE"]
 authors = [{ name = "Paulo Alvarado Garcia" }]
 keywords = ["agents", "decisions", "druks", "durable-execution", "workflows"]
 requires-python = ">=3.11"
-# Panel declares its screens with the Druks UI V1 contract, which landed after
-# 0.4.0. Pin the exact Druks commit until that contract has a versioned release.
-dependencies = [
-    "druks @ git+https://github.com/czpython/druks.git@c05c58876dde4f9dfb8eac0baeb5335bbb3991b9",
-]
+dependencies = ["druks>=0.4.0"]
 
 [project.urls]
 Documentation = "https://docs.druks.ai"

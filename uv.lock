@@ -606,7 +606,7 @@ wheels = [
 [[package]]
 name = "druks"
 version = "0.4.0"
-source = { git = "https://github.com/czpython/druks.git?rev=c05c58876dde4f9dfb8eac0baeb5335bbb3991b9#c05c58876dde4f9dfb8eac0baeb5335bbb3991b9" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alembic" },
     { name = "apprise" },
@@ -631,6 +631,10 @@ dependencies = [
     { name = "uuid-utils" },
     { name = "uvicorn" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/2f/b3/13b37cd338912cca97f5e080862a7c51d494e093bd494999a9cd7cf77e3a/druks-0.4.0.tar.gz", hash = "sha256:19ace231de25ed2500152e88ba6c7aaf26f4bd8d13909b5341cbe346d4f73951", size = 317947, upload-time = "2026-08-29T18:09:45.36Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/63/2f/7d394709c7d90840f2014d196a69d876681d464b09b7f3b821ff682db397/druks-0.4.0-py3-none-any.whl", hash = "sha256:2b01bf81e40378abfdc6d9eda76339cd302744564846daa6794c9f74cbad61ed", size = 422486, upload-time = "2026-08-29T18:09:43.678Z" },
+]
 
 [[package]]
 name = "druks-panel"
@@ -647,7 +651,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "druks", git = "https://github.com/czpython/druks.git?rev=c05c58876dde4f9dfb8eac0baeb5335bbb3991b9" }]
+requires-dist = [{ name = "druks", specifier = ">=0.4.0" }]
 
 [package.metadata.requires-dev]
 dev = [
