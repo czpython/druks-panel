@@ -33,8 +33,8 @@ The example includes:
 
 The screens are Python. `druks_panel/pages.py` declares them with `druks.ui`,
 and the Druks dashboard renders them. The app ships no JavaScript. Each page is
-a pure read that follows its subject, so the board and the decision page redraw
-as each advisor reports.
+a pure read. The board follows every decision. A decision page follows its own
+row. Thus both redraw as each advisor reports.
 
 Druks reuses completed durable operations when a workflow recovers. An operation
 that stops before completion can run again. Thus, this app does not claim
@@ -70,10 +70,11 @@ service. Connect at least one Claude harness before you start a panel.
 
 ## Use
 
-Open **Panel** in the Druks dashboard. Select **new decision**. Enter the
-decision and its context. Then start the deliberation. The page updates after
-each advisor and the moderator finish. When the run parks, read the synthesis.
-Then record the human outcome on the same page.
+Open **Panel** in the Druks dashboard. The board opens first. Select **New
+decision**. Enter the decision and its context. Then start the deliberation.
+Open the decision from the board. A card appears for each advisor as it
+reports. When the run parks, read the synthesis. Then record the human outcome
+on the same page.
 
 Agent defaults use standard Druks agent settings. An operator can change the
 model, effort, and timeout for each advisor in the dashboard. This change does
