@@ -267,6 +267,6 @@ async def decision(decision_id: int):
     return ui.Page(
         f"Decision {decision_id}",
         blocks=[
-            ui.EmptyState("No such decision", actions=[ui.Link("Decisions", page="decisions")])
+            ui.EmptyState("No such decision", controls=[ui.Link("Decisions", page="decisions")])
         ],
     )
