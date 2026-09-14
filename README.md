@@ -66,7 +66,7 @@ RUN uv pip install "git+https://github.com/czpython/druks-panel.git"
 ```
 
 Use that image for the Druks `web` service. Run `druks init-db`. Restart the
-service. Connect at least one Claude harness before you start a panel.
+service. Connect a model provider in Settings before you start a panel.
 
 ## Use
 
@@ -74,7 +74,9 @@ Open **Panel** in the Druks dashboard. The board opens first. Select **New
 decision**. Enter the decision and its context. Then start the deliberation.
 Open the decision from the board. A card appears for each advisor as it
 reports. When the run parks, read the synthesis. Then record the human outcome
-on the same page.
+on the same page. The Druks Dashboard also lists the waiting decision and opens
+this page. Each assessment, the synthesis, and the recorded outcome appear in
+Activity.
 
 Agent defaults use standard Druks agent settings. An operator can change the
 model, effort, and timeout for each advisor in the dashboard. This change does

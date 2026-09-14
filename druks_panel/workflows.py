@@ -62,6 +62,7 @@ class Deliberate(Workflow):
             }
         )
         await self.persist_outcome(action=reply.action, note=reply.note)
+        await self.announce("decision.recorded", action=reply.action)
         return {"action": reply.action}
 
     @step

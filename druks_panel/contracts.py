@@ -12,7 +12,7 @@ class AdvisorAssessment(AgentOutput):
     uncertainties: list[str]
     confidence: int = Field(ge=0, le=100)
 
-    def get_artifact(self) -> dict[str, str]:
+    def to_artifact(self) -> dict[str, str]:
         rationale = "\n".join(f"- {item}" for item in self.rationale)
         uncertainties = "\n".join(f"- {item}" for item in self.uncertainties)
         content = (
@@ -28,6 +28,9 @@ class AdvisorAssessment(AgentOutput):
             "content": content,
         }
 
+    def to_event(self) -> dict[str, str]:
+        return {"topic": f"{self.perspective}.assessed", "summary": self.headline}
+
 
 class ModeratorSynthesis(AgentOutput):
     recommendation: DecisionAction
@@ -37,7 +40,7 @@ class ModeratorSynthesis(AgentOutput):
     questions_to_resolve: list[str]
     next_step: str
 
-    def get_artifact(self) -> dict[str, str]:
+    def to_artifact(self) -> dict[str, str]:
         common_ground = "\n".join(f"- {item}" for item in self.common_ground)
         tradeoffs = "\n".join(f"- {item}" for item in self.tradeoffs)
         questions = "\n".join(f"- {item}" for item in self.questions_to_resolve)
@@ -51,3 +54,6 @@ class ModeratorSynthesis(AgentOutput):
             f"## Next step\n\n{self.next_step}"
         )
         return {"kind": "markdown", "title": "Panel synthesis", "content": content}
+
+    def to_event(self) -> dict[str, str]:
+        return {"topic": "recommendation.made", "summary": self.summary}

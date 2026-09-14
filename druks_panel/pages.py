@@ -201,7 +201,7 @@ async def new_decision():
     )
 
 
-@ui.page("/decisions/{decision_id}")
+@ui.page("/decisions/{decision_id}", subject=Decision)
 async def decision(decision_id: int):
     found = await Decision.get(decision_id)
     if found:
