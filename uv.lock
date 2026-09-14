@@ -605,7 +605,7 @@ wheels = [
 
 [[package]]
 name = "druks"
-version = "0.4.0"
+version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alembic" },
@@ -631,9 +631,9 @@ dependencies = [
     { name = "uuid-utils" },
     { name = "uvicorn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2f/b3/13b37cd338912cca97f5e080862a7c51d494e093bd494999a9cd7cf77e3a/druks-0.4.0.tar.gz", hash = "sha256:19ace231de25ed2500152e88ba6c7aaf26f4bd8d13909b5341cbe346d4f73951", size = 317947, upload-time = "2026-08-29T18:09:45.36Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/26/1dfb52a5256a330d5c0dcfe71fc0d70ae22c3985e69ffacf82867cc8e1b0/druks-0.5.0.tar.gz", hash = "sha256:fd4642f4ce06297766d0dcc1fa98c764cbf94ba54efd41a01ee3726a72557aef", size = 338200, upload-time = "2026-09-05T18:00:30.468Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/2f/7d394709c7d90840f2014d196a69d876681d464b09b7f3b821ff682db397/druks-0.4.0-py3-none-any.whl", hash = "sha256:2b01bf81e40378abfdc6d9eda76339cd302744564846daa6794c9f74cbad61ed", size = 422486, upload-time = "2026-08-29T18:09:43.678Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/78/829eceb3d90388d64bc3518ebf64254af55d253ad46c43b51c6237b232e2/druks-0.5.0-py3-none-any.whl", hash = "sha256:d224d388a64e335a459bfe34f74613feaf3689ad5067cd18fd553e01e5569dcb", size = 448614, upload-time = "2026-09-05T18:00:28.741Z" },
 ]
 
 [[package]]
@@ -651,7 +651,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "druks", specifier = ">=0.4.0" }]
+requires-dist = [{ name = "druks", specifier = ">=0.5.0" }]
 
 [package.metadata.requires-dev]
 dev = [
