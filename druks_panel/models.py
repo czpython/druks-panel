@@ -40,9 +40,6 @@ class Decision(StoredSubject):
         stmt = select(cls).order_by(cls.created_at.desc(), cls.id.desc()).limit(limit)
         return list(await db_session().scalars(stmt))
 
-    def get_label(self) -> str:
-        return self.title
-
     def get_summary(self) -> DecisionSummary:
         return DecisionSummary.model_validate(self)
 
@@ -60,10 +57,10 @@ class Decision(StoredSubject):
         self.assessments = assessments
         self.synthesis = synthesis
         self.recommendation = recommendation
-        await db_session().flush()
+        await self.session.flush()
 
     async def save_outcome(self, *, action: DecisionAction, note: str) -> None:
         self.outcome = action
         self.outcome_note = note
         self.decided_at = self.utc_now()
-        await db_session().flush()
+        await self.session.flush()

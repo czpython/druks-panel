@@ -28,7 +28,6 @@ class CreateDecisionResponse(Schema):
 
 
 class DecisionSummary(SubjectSummary):
-    title: str
     question: str
     recommendation: DecisionAction | None
     outcome: DecisionAction | None
