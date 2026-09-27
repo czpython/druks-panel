@@ -84,15 +84,17 @@ not require a package change.
 
 ## Develop
 
-This repository has no tests. The gates are the linter, the formatter, and the
-type checker:
+This repository has no tests. The gates are the linter, the formatter, the
+type checker, and the Druks app check:
 
 ```bash
 uv sync --dev
 uv run ruff check .
 uv run ruff format --check .
 uv run pyright
+uv run druks check-app panel
 ```
 
-Druks checks the rest at boot. It refuses the app if a page route, a navigation
-entry, or an action that names a route operation does not resolve.
+The app check loads Panel as Druks does at boot. It needs no database. It checks
+the subjects, pages, operations, and routers, and it fails on the first broken
+contract.

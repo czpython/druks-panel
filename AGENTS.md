@@ -42,4 +42,5 @@ assessments. Then the workflow parks for a human outcome.
 uv run ruff check .
 uv run ruff format --check .
 uv run pyright
+uv run druks check-app panel
 ```

@@ -5,20 +5,6 @@ from druks_panel.contracts import AdvisorAssessment, ModeratorSynthesis
 from druks_panel.models import Decision
 
 
-def _run_word(status: SubjectStatus) -> ui.StatusValue:
-    """Where Druks is with the deliberation. The read side ships the state. The
-    panel writes the word and selects the tone."""
-    if status.is_parked:
-        return ui.StatusValue("your call", tone="warning")
-    if status.is_running:
-        return ui.StatusValue("deliberating", tone="active")
-    if status.is_failed:
-        return ui.StatusValue(status.failure or "failed", tone="danger")
-    if status.state:
-        return ui.StatusValue(str(status.state))
-    return ui.StatusValue("not started")
-
-
 def _action_word(action: str | None) -> ui.StatusValue:
     """A panel verdict, recommended or recorded."""
     if action == "proceed":
@@ -119,8 +105,7 @@ def _human_call(decision: Decision, status: SubjectStatus) -> ui.Section:
 
 @ui.page("/")
 async def decisions():
-    recent = await Decision.list_recent()
-    statuses = await Decision.get_statuses([decision.id for decision in recent])
+    recent = await Decision.all()
     return ui.Page(
         "Decisions",
         description="Every question this panel has weighed.",
@@ -142,12 +127,10 @@ async def decisions():
                                 decision.title,
                                 description=decision.question,
                                 link=ui.Link(
-                                    decision.title,
-                                    page="decision",
-                                    arguments={"decision_id": str(decision.id)},
+                                    page="decision", arguments={"decision_id": decision.id}
                                 ),
                             ),
-                            _run_word(statuses[str(decision.id)]),
+                            ui.SubjectStatus(decision, working="deliberating"),
                             _action_word(decision.recommendation),
                             _action_word(decision.outcome),
                             ui.TimeValue(decision.created_at),
@@ -155,7 +138,7 @@ async def decisions():
                     )
                     for decision in recent
                 ],
-                empty_text="No decision has gone to the panel yet.",
+                empty=ui.EmptyState("No decision has gone to the panel yet."),
             ),
         ],
     )
@@ -203,70 +186,62 @@ async def new_decision():
 
 @ui.page("/decisions/{decision_id}", subject=Decision)
 async def decision(decision_id: int):
-    found = await Decision.get(decision_id)
-    if found:
-        status = await found.get_status()
-        assessments = [AdvisorAssessment.model_validate(item) for item in found.assessments]
-        return ui.Page(
-            found.title,
-            description=found.question,
-            # The whole page follows: an operator watches each advisor land. A
-            # parked run publishes nothing, so a redraw cannot wipe the form below.
-            follows=found,
-            blocks=[
-                ui.Facts(
-                    [
-                        ui.Fact("Panel", value=_run_word(status)),
-                        ui.Fact("Recommends", value=_action_word(found.recommendation)),
-                        ui.Fact("Outcome", value=_action_word(found.outcome)),
-                        ui.Fact("Opened", value=ui.TimeValue(found.created_at)),
-                    ]
-                ),
-                ui.Section(
-                    title="Context",
-                    blocks=[ui.Markdown(found.context or "Nobody added context.")],
-                ),
-                ui.Cards(
-                    title="The advisors",
-                    cards=[
-                        ui.Card(
-                            title=assessment.perspective.title(),
-                            description=assessment.headline,
-                            blocks=[
-                                ui.Facts(
-                                    [
-                                        ui.Fact("Position", value=_position_word(assessment)),
-                                        ui.Fact(
-                                            "Confidence",
-                                            value=ui.NumberValue(assessment.confidence, unit="%"),
-                                        ),
-                                    ]
-                                ),
-                                ui.List(
-                                    [ui.TextValue(item) for item in assessment.rationale],
-                                    title="Rationale",
-                                ),
-                                ui.List(
-                                    [ui.TextValue(item) for item in assessment.uncertainties],
-                                    title="Uncertainties",
-                                ),
-                            ],
-                        )
-                        for assessment in assessments
-                    ],
-                    empty=ui.EmptyState(
-                        "No assessment yet",
-                        description="Each advisor reports here when it finishes.",
-                    ),
-                ),
-                _synthesis(found),
-                _human_call(found, status),
-                ui.Link("Everything Druks did about this decision", subject=found),
-            ],
-        )
+    decision = await Decision.get(id=decision_id)
+    status = await decision.get_status()
+    assessments = [AdvisorAssessment.model_validate(item) for item in decision.assessments]
     return ui.Page(
-        f"Decision {decision_id}",
+        decision.title,
+        description=decision.question,
+        # The whole page follows: an operator watches each advisor land. A
+        # parked run publishes nothing, so a redraw cannot wipe the form below.
+        follows=decision,
         blocks=[
-            ui.EmptyState("No such decision", controls=[ui.Link("Decisions", page="decisions")])
+            ui.Facts(
+                [
+                    ui.Fact("Panel", value=ui.SubjectStatus(decision, working="deliberating")),
+                    ui.Fact("Recommends", value=_action_word(decision.recommendation)),
+                    ui.Fact("Outcome", value=_action_word(decision.outcome)),
+                    ui.Fact("Opened", value=ui.TimeValue(decision.created_at)),
+                ]
+            ),
+            ui.Section(
+                title="Context",
+                blocks=[ui.Markdown(decision.context or "Nobody added context.")],
+            ),
+            ui.Cards(
+                title="The advisors",
+                cards=[
+                    ui.Card(
+                        title=assessment.perspective.title(),
+                        description=assessment.headline,
+                        blocks=[
+                            ui.Facts(
+                                [
+                                    ui.Fact("Position", value=_position_word(assessment)),
+                                    ui.Fact(
+                                        "Confidence",
+                                        value=ui.NumberValue(assessment.confidence, unit="%"),
+                                    ),
+                                ]
+                            ),
+                            ui.List(
+                                [ui.TextValue(item) for item in assessment.rationale],
+                                title="Rationale",
+                            ),
+                            ui.List(
+                                [ui.TextValue(item) for item in assessment.uncertainties],
+                                title="Uncertainties",
+                            ),
+                        ],
+                    )
+                    for assessment in assessments
+                ],
+                empty=ui.EmptyState(
+                    "No assessment yet",
+                    description="Each advisor reports here when it finishes.",
+                ),
+            ),
+            _synthesis(decision),
+            _human_call(decision, status),
         ],
     )

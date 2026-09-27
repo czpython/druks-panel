@@ -15,8 +15,8 @@ router = APIRouter(prefix="/decisions")
 
 
 @router.get("", response_model=list[DecisionSummary], response_model_by_alias=True)
-async def list_decisions() -> list[DecisionSummary]:
-    return [decision.get_summary() for decision in await Decision.list_recent()]
+async def list_decisions() -> list[Decision]:
+    return await Decision.all()
 
 
 @router.post(
@@ -42,9 +42,7 @@ async def create_decision(body: CreateDecisionRequest) -> CreateDecisionResponse
     operation_id="record_outcome",
 )
 async def record_outcome(decision_id: int, body: DecisionOutcomeRequest) -> dict[str, str]:
-    decision = await Decision.get(decision_id)
-    if not decision:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, f"No decision {decision_id}.")
+    decision = await Decision.get(id=decision_id)
     try:
         await RecordDecision.answer(decision, action=body.action, note=body.note)
     except WorkflowError as error:

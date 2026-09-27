@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from druks.schemas import Schema
-from druks.workflows import SubjectSummary
 from pydantic import BaseModel, ConfigDict, Field
 
 from druks_panel.types import DecisionAction
@@ -27,7 +26,11 @@ class CreateDecisionResponse(Schema):
     run_id: str
 
 
-class DecisionSummary(SubjectSummary):
+class DecisionSummary(Schema):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
     question: str
     recommendation: DecisionAction | None
     outcome: DecisionAction | None
