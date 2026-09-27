@@ -119,7 +119,7 @@ def _human_call(decision: Decision, status: SubjectStatus) -> ui.Section:
 
 @ui.page("/")
 async def decisions():
-    recent = await Decision.list_recent()
+    recent = await Decision.all()
     statuses = await Decision.get_statuses([decision.id for decision in recent])
     return ui.Page(
         "Decisions",
@@ -203,70 +203,63 @@ async def new_decision():
 
 @ui.page("/decisions/{decision_id}", subject=Decision)
 async def decision(decision_id: int):
-    found = await Decision.get(decision_id)
-    if found:
-        status = await found.get_status()
-        assessments = [AdvisorAssessment.model_validate(item) for item in found.assessments]
-        return ui.Page(
-            found.title,
-            description=found.question,
-            # The whole page follows: an operator watches each advisor land. A
-            # parked run publishes nothing, so a redraw cannot wipe the form below.
-            follows=found,
-            blocks=[
-                ui.Facts(
-                    [
-                        ui.Fact("Panel", value=_run_word(status)),
-                        ui.Fact("Recommends", value=_action_word(found.recommendation)),
-                        ui.Fact("Outcome", value=_action_word(found.outcome)),
-                        ui.Fact("Opened", value=ui.TimeValue(found.created_at)),
-                    ]
-                ),
-                ui.Section(
-                    title="Context",
-                    blocks=[ui.Markdown(found.context or "Nobody added context.")],
-                ),
-                ui.Cards(
-                    title="The advisors",
-                    cards=[
-                        ui.Card(
-                            title=assessment.perspective.title(),
-                            description=assessment.headline,
-                            blocks=[
-                                ui.Facts(
-                                    [
-                                        ui.Fact("Position", value=_position_word(assessment)),
-                                        ui.Fact(
-                                            "Confidence",
-                                            value=ui.NumberValue(assessment.confidence, unit="%"),
-                                        ),
-                                    ]
-                                ),
-                                ui.List(
-                                    [ui.TextValue(item) for item in assessment.rationale],
-                                    title="Rationale",
-                                ),
-                                ui.List(
-                                    [ui.TextValue(item) for item in assessment.uncertainties],
-                                    title="Uncertainties",
-                                ),
-                            ],
-                        )
-                        for assessment in assessments
-                    ],
-                    empty=ui.EmptyState(
-                        "No assessment yet",
-                        description="Each advisor reports here when it finishes.",
-                    ),
-                ),
-                _synthesis(found),
-                _human_call(found, status),
-                ui.Link("Everything Druks did about this decision", subject=found),
-            ],
-        )
+    decision = await Decision.get(id=decision_id)
+    status = await decision.get_status()
+    assessments = [AdvisorAssessment.model_validate(item) for item in decision.assessments]
     return ui.Page(
-        f"Decision {decision_id}",
+        decision.title,
+        description=decision.question,
+        # The whole page follows: an operator watches each advisor land. A
+        # parked run publishes nothing, so a redraw cannot wipe the form below.
+        follows=decision,
         blocks=[
-            ui.EmptyState("No such decision", controls=[ui.Link("Decisions", page="decisions")])
+            ui.Facts(
+                [
+                    ui.Fact("Panel", value=_run_word(status)),
+                    ui.Fact("Recommends", value=_action_word(decision.recommendation)),
+                    ui.Fact("Outcome", value=_action_word(decision.outcome)),
+                    ui.Fact("Opened", value=ui.TimeValue(decision.created_at)),
+                ]
+            ),
+            ui.Section(
+                title="Context",
+                blocks=[ui.Markdown(decision.context or "Nobody added context.")],
+            ),
+            ui.Cards(
+                title="The advisors",
+                cards=[
+                    ui.Card(
+                        title=assessment.perspective.title(),
+                        description=assessment.headline,
+                        blocks=[
+                            ui.Facts(
+                                [
+                                    ui.Fact("Position", value=_position_word(assessment)),
+                                    ui.Fact(
+                                        "Confidence",
+                                        value=ui.NumberValue(assessment.confidence, unit="%"),
+                                    ),
+                                ]
+                            ),
+                            ui.List(
+                                [ui.TextValue(item) for item in assessment.rationale],
+                                title="Rationale",
+                            ),
+                            ui.List(
+                                [ui.TextValue(item) for item in assessment.uncertainties],
+                                title="Uncertainties",
+                            ),
+                        ],
+                    )
+                    for assessment in assessments
+                ],
+                empty=ui.EmptyState(
+                    "No assessment yet",
+                    description="Each advisor reports here when it finishes.",
+                ),
+            ),
+            _synthesis(decision),
+            _human_call(decision, status),
+            ui.Link("Everything Druks did about this decision", subject=decision),
         ],
     )
