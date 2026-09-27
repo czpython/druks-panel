@@ -1,5 +1,4 @@
 from druks import ui
-from druks.workflows import SubjectStatus
 
 from druks_panel.contracts import AdvisorAssessment, ModeratorSynthesis
 from druks_panel.models import Decision
@@ -49,8 +48,8 @@ def _synthesis(decision: Decision) -> ui.Section:
     )
 
 
-def _human_call(decision: Decision, status: SubjectStatus) -> ui.Section:
-    """The human gate: the form while the run waits, the record after."""
+def _human_call(decision: Decision) -> ui.Section:
+    """The human gate: the controls while the run waits, the record after."""
     if decision.outcome:
         return ui.Section(
             title="The call",
@@ -64,42 +63,12 @@ def _human_call(decision: Decision, status: SubjectStatus) -> ui.Section:
                 ui.Quote(decision.outcome_note or "Nobody left a note."),
             ],
         )
-    if status.is_parked:
-        return ui.Section(
-            title="The call",
-            blocks=[
-                ui.Form(
-                    description="The run stays parked until you record the outcome.",
-                    fields=[
-                        ui.RadioField(
-                            name="action",
-                            label="Outcome",
-                            options=[
-                                ui.Option("Proceed", value="proceed"),
-                                ui.Option("Revise", value="revise"),
-                                ui.Option("Pass", value="pass"),
-                            ],
-                            is_required=True,
-                        ),
-                        ui.TextAreaField(
-                            name="note",
-                            label="Note",
-                            rows=3,
-                            help_text="What the record must say about this call.",
-                        ),
-                    ],
-                    action=ui.Action(
-                        label="Record the decision",
-                        operation="record_outcome",
-                        arguments={"decision_id": decision.id},
-                        tone="primary",
-                    ),
-                )
-            ],
-        )
     return ui.Section(
         title="The call",
-        blocks=[ui.Text("The run parks here after the moderator reports.")],
+        blocks=[
+            ui.Text("After the moderator reports, the run waits here for your call."),
+            ui.GateControls(decision),
+        ],
     )
 
 
@@ -187,13 +156,12 @@ async def new_decision():
 @ui.page("/decisions/{decision_id}", subject=Decision)
 async def decision(decision_id: int):
     decision = await Decision.get(id=decision_id)
-    status = await decision.get_status()
     assessments = [AdvisorAssessment.model_validate(item) for item in decision.assessments]
     return ui.Page(
         decision.title,
         description=decision.question,
         # The whole page follows: an operator watches each advisor land. A
-        # parked run publishes nothing, so a redraw cannot wipe the form below.
+        # parked run publishes nothing, so a redraw cannot wipe a half-written note.
         follows=decision,
         blocks=[
             ui.Facts(
@@ -242,6 +210,6 @@ async def decision(decision_id: int):
                 ),
             ),
             _synthesis(decision),
-            _human_call(decision, status),
+            _human_call(decision),
         ],
     )
