@@ -1,14 +1,8 @@
-from druks.workflows import WorkflowError
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 
 from druks_panel.models import Decision
-from druks_panel.schemas import (
-    CreateDecisionRequest,
-    CreateDecisionResponse,
-    DecisionOutcomeRequest,
-    DecisionSummary,
-)
-from druks_panel.workflows import Deliberate, RecordDecision
+from druks_panel.schemas import CreateDecisionRequest, CreateDecisionResponse, DecisionSummary
+from druks_panel.workflows import Deliberate
 
 # Every APIRouter declared here mounts under /api/panel.
 router = APIRouter(prefix="/decisions")
@@ -34,17 +28,3 @@ async def create_decision(body: CreateDecisionRequest) -> CreateDecisionResponse
     )
     run_id = await Deliberate.start(subject=decision)
     return CreateDecisionResponse(id=decision.id, run_id=run_id)
-
-
-@router.post(
-    "/{decision_id}/outcome",
-    status_code=status.HTTP_202_ACCEPTED,
-    operation_id="record_outcome",
-)
-async def record_outcome(decision_id: int, body: DecisionOutcomeRequest) -> dict[str, str]:
-    decision = await Decision.get(id=decision_id)
-    try:
-        await RecordDecision.answer(decision, action=body.action, note=body.note)
-    except WorkflowError as error:
-        raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from error
-    return {"result": "recorded"}

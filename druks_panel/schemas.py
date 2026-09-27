@@ -14,13 +14,6 @@ class CreateDecisionRequest(BaseModel):
     context: str = Field(default="", max_length=4000)
 
 
-class DecisionOutcomeRequest(BaseModel):
-    model_config = ConfigDict(str_strip_whitespace=True)
-
-    action: DecisionAction
-    note: str = Field(default="", max_length=2000)
-
-
 class CreateDecisionResponse(Schema):
     id: int
     run_id: str

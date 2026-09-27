@@ -55,11 +55,7 @@ class Deliberate(Workflow):
         )
 
         reply = await RecordDecision.wait(
-            input_request={
-                "presentation": "external",
-                "label": "Record the decision",
-                "url": f"/panel/decisions/{decision.id}",
-            }
+            input_request={"presentation": "in_app", "label": "Record the decision"}
         )
         await self.persist_outcome(action=reply.action, note=reply.note)
         await self.announce("decision.recorded", action=reply.action)
